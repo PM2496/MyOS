@@ -1,5 +1,6 @@
 #include "print.h"
 #include "debug.h"
+#include "init.h"
 int main(void)
 {
     put_str("I am kernel\n");
