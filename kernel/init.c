@@ -8,4 +8,5 @@ void init_all(void)
     put_str("init_all\n");
     idt_init();   // Initialize the Interrupt Descriptor Table
     timer_init(); // Initialize the timer
+    mem_init();   // Initialize memory management
 }
