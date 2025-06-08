@@ -9,7 +9,7 @@
 #define PIC_S_CTRL 0xa0
 #define PIC_S_DATA 0xa1
 
-#define IDT_DESC_CNT 0x21
+#define IDT_DESC_CNT 0x30
 
 #define EFLAGS_IF 0x00000200                                                     // Interrupt Flag in EFLAGS register
 #define GET_EFLAGS(EFLAG_VAR) asm volatile("pushfl; popl %0" : "=g"(EFLAG_VAR)); // Get EFLAGS value
@@ -43,7 +43,16 @@ static void pic_init(void)
     outb(PIC_S_DATA, 0x02); // Slave PIC connected to IRQ2
     outb(PIC_S_DATA, 0x01); // Enable Slave PIC
 
-    outb(PIC_M_DATA, 0xfe); // Mask all IRQs except for timer (IRQ0)
+    /* timer中断 */
+    // outb(PIC_M_DATA, 0xfe); // Mask all IRQs except for timer (IRQ0)
+    // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
+
+    /* 键盘中断 */
+    // outb(PIC_M_DATA, 0xfd); // Mask all IRQs except for keyboard (IRQ1)
+    // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
+
+    // 允许时钟中断和键盘中断
+    outb(PIC_M_DATA, 0xfc); // Mask all IRQs except for timer (IRQ0) and keyboard (IRQ1)
     outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
 
     put_str("   pic_init done\n");
@@ -74,9 +83,32 @@ static void general_intr_handler(uint8_t vec_nr)
     {
         return;
     }
-    put_str("int vector: 0x");
-    put_int(vec_nr);
-    put_char('\n');
+
+    /* 将光标置为0,从屏幕左上角清出一片打印异常信息的区域,方便阅读 */
+    set_cursor(0);
+    int cursor_pos = 0;
+    while (cursor_pos < 320)
+    {
+        put_char(' ');
+        cursor_pos++;
+    }
+
+    set_cursor(0); // 重置光标为屏幕左上角
+    put_str("!!!!!!!      excetion message begin  !!!!!!!!\n");
+    set_cursor(88); // 从第2行第8个字符开始打印
+    put_str(intr_name[vec_nr]);
+    if (vec_nr == 14)
+    { // 若为Pagefault,将缺失的地址打印出来并悬停
+        int page_fault_vaddr = 0;
+        asm("movl %%cr2, %0" : "=r"(page_fault_vaddr)); // cr2是存放造成page_fault的地址
+        put_str("\npage fault addr is ");
+        put_int(page_fault_vaddr);
+    }
+    put_str("\n!!!!!!!      excetion message end    !!!!!!!!\n");
+    // 能进入中断处理程序就表示已经处在关中断情况下,
+    // 不会出现调度进程的情况。故下面的死循环不会再被中断。
+    while (1)
+        ;
 }
 
 static void exception_init(void)
@@ -110,21 +142,6 @@ static void exception_init(void)
     intr_name[17] = "#AC Alignment Check Exception";
     intr_name[18] = "#MC Machine Check Exception";
     intr_name[19] = "#XF SIMD Floating-Point Exception";
-}
-
-void idt_init(void)
-{
-    put_str("idt_init start\n");
-
-    idt_desc_init();  // Initialize IDT descriptors
-    exception_init(); // Initialize exception handlers
-    pic_init();       // Initialize PIC
-
-    // Load IDT
-    uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)(uint32_t)idt << 16));
-    asm volatile("lidt %0" : : "m"(idt_operand));
-
-    put_str("idt_init done\n");
 }
 
 /* 开中断并返回开中断前的状态 */
@@ -180,4 +197,26 @@ enum intr_status intr_get_status(void)
     {
         return INTR_OFF; // IF位为0，表示中断关闭
     }
+}
+
+void register_handler(uint8_t vec_nr, intr_handler function)
+{
+    /* idt_table数组中的函数是在进入中断后根据中断向量号调用的,
+     * 见kernel/kernel.S的call [idt_table + %1*4] */
+    idt_table[vec_nr] = function; // 注册中断处理函数
+}
+
+void idt_init(void)
+{
+    put_str("idt_init start\n");
+
+    idt_desc_init();  // Initialize IDT descriptors
+    exception_init(); // Initialize exception handlers
+    pic_init();       // Initialize PIC
+
+    // Load IDT
+    uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)(uint32_t)idt << 16));
+    asm volatile("lidt %0" : : "m"(idt_operand));
+
+    put_str("idt_init done\n");
 }
