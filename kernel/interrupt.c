@@ -44,16 +44,16 @@ static void pic_init(void)
     outb(PIC_S_DATA, 0x01); // Enable Slave PIC
 
     /* timer中断 */
-    // outb(PIC_M_DATA, 0xfe); // Mask all IRQs except for timer (IRQ0)
-    // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
+    outb(PIC_M_DATA, 0xfe); // Mask all IRQs except for timer (IRQ0)
+    outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
 
     /* 键盘中断 */
     // outb(PIC_M_DATA, 0xfd); // Mask all IRQs except for keyboard (IRQ1)
     // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
 
     // 允许时钟中断和键盘中断
-    outb(PIC_M_DATA, 0xfc); // Mask all IRQs except for timer (IRQ0) and keyboard (IRQ1)
-    outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
+    // outb(PIC_M_DATA, 0xfc); // Mask all IRQs except for timer (IRQ0) and keyboard (IRQ1)
+    // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
 
     put_str("   pic_init done\n");
 }

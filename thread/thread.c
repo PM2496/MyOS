@@ -6,6 +6,7 @@
 #include "../kernel/interrupt.h"
 #include "../lib/kernel/print.h"
 #include "../kernel/memory.h"
+#include "../userprog/process.h"
 
 #define PG_SIZE 4096
 
@@ -37,8 +38,7 @@ static void kernel_thread(thread_func *function, void *func_arg)
 /* 初始化线程栈thread_stack，将待执行的函数和参数放到thread_stack中相应的位置 */
 void thread_create(struct task_struct *pthread, thread_func *function, void *func_arg)
 {
-    // TODO
-    // pthread->self_kstack -= sizeof(struct intr_stack);
+    pthread->self_kstack -= sizeof(struct intr_stack);
     pthread->self_kstack -= sizeof(struct thread_stack);
     struct thread_stack *kthread_stack = (struct thread_stack *)pthread->self_kstack;
     kthread_stack->eip = kernel_thread; // eip指向kernel_thread
@@ -143,6 +143,7 @@ void schedule(void)
     thread_tag = list_pop(&thread_ready_list);
     struct task_struct *next = elem2entry(struct task_struct, general_tag, thread_tag); // 获取下一个线程pcb
     next->status = TASK_RUNNING;                                                        // 将下一个线程状态设置为运行中
+    process_activate(next);                                                             // 激活下一个线程的页表
     switch_to(cur, next);                                                               // 切换到下一个线程
 }
 

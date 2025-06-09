@@ -6,6 +6,7 @@
 #include "../thread/thread.h"
 #include "../device/console.h"
 #include "../device/keyboard.h"
+#include "../userprog/tss.h"
 
 void init_all(void)
 {
@@ -16,4 +17,5 @@ void init_all(void)
     timer_init();    // Initialize the timer
     console_init();  // Initialize the console
     keyboard_init(); // Initialize the keyboard
+    tss_init();      // Initialize Task State Segment
 }

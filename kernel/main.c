@@ -7,9 +7,13 @@
 #include "../device/console.h"
 #include "../device/ioqueue.h"
 #include "../device/keyboard.h"
+#include "../userprog/process.h"
 
 void k_thread_a(void *arg);
 void k_thread_b(void *arg);
+void u_prog_a(void);
+void u_prog_b(void);
+int test_var_a = 0, test_var_b = 0;
 
 int main(void)
 {
@@ -18,6 +22,8 @@ int main(void)
 
     thread_start("consumer_a", 31, k_thread_a, " A_");
     thread_start("consumer_b", 31, k_thread_b, " B_");
+    process_execute(u_prog_a, "u_prog_a");
+    process_execute(u_prog_b, "u_prog_b");
 
     intr_enable(); // Enable interrupts
 
@@ -33,14 +39,8 @@ void k_thread_a(void *arg)
     char *para = arg;
     while (1)
     {
-        enum intr_status old_status = intr_disable(); // Disable interrupts
-        if (!ioq_empty(&kbd_buf))                     // Check if the keyboard buffer is not empty
-        {
-            char byte = ioq_getchar(&kbd_buf); // Get a character from the keyboard buffer
-            console_put_str(para);             // Output the parameter string
-            console_put_char(byte);            // Output the character
-        }
-        intr_set_status(old_status); // Restore previous interrupt status
+        console_put_str(" v_a: 0x");
+        console_put_int(test_var_a); // Output the value of test_var_b
     }
 }
 
@@ -49,13 +49,23 @@ void k_thread_b(void *arg)
     char *para = arg;
     while (1)
     {
-        enum intr_status old_status = intr_disable(); // Disable interrupts
-        if (!ioq_empty(&kbd_buf))                     // Check if the keyboard buffer is not empty
-        {
-            char byte = ioq_getchar(&kbd_buf); // Get a character from the keyboard buffer
-            console_put_str(para);             // Output the parameter string
-            console_put_char(byte);            // Output the character
-        }
-        intr_set_status(old_status); // Restore previous interrupt status
+        console_put_str(" v_b: 0x");
+        console_put_int(test_var_b); // New line for better readability
+    }
+}
+
+void u_prog_a(void)
+{
+    while (1)
+    {
+        test_var_a++;
+    }
+}
+
+void u_prog_b(void)
+{
+    while (1)
+    {
+        test_var_b++;
     }
 }

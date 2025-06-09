@@ -26,7 +26,9 @@ OBJS = $(BUILD_DIR)/main.o \
 	   $(BUILD_DIR)/console.o \
 	   $(BUILD_DIR)/sync.o \
 	   $(BUILD_DIR)/keyboard.o \
-	   $(BUILD_DIR)/ioqueue.o
+	   $(BUILD_DIR)/ioqueue.o \
+	   $(BUILD_DIR)/tss.o \
+	   $(BUILD_DIR)/process.o 
 
 $(BUILD_DIR)/mbr.bin: boot/mbr.S 
 	$(AS) $(ASBINLIB) -o $@ $<
@@ -107,6 +109,17 @@ $(BUILD_DIR)/keyboard.o: device/keyboard.c device/keyboard.h lib/kernel/print.h 
 $(BUILD_DIR)/ioqueue.o: device/ioqueue.c device/ioqueue.h lib/stdint.h thread/thread.h \
 						lib/kernel/list.h kernel/global.h thread/sync.h kernel/interrupt.h \
 						kernel/debug.h
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/tss.o: userprog/tss.c userprog/tss.h thread/thread.h lib/stdint.h \
+					lib/kernel/list.h kernel/global.h lib/string.h \
+					lib/kernel/print.h
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/process.o: userprog/process.c userprog/process.h thread/thread.h \
+						lib/kernel/list.h kernel/global.h kernel/debug.h \
+						kernel/memory.h lib/kernel/bitmap.h userprog/tss.h kernel/interrupt.h \
+						lib/string.h lib/stdint.h
 	$(CC) $(CFLAGS) $< -o $@
 
 
