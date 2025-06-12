@@ -8,6 +8,8 @@
 /* 自定义通用函数类型,它将在很多线程函数中做为形参类型 */
 typedef void thread_func(void *);
 
+typedef int16_t pid_t; // 定义pid_t为int16_t类型,用于表示进程或线程的ID
+
 /* 进程或线程的状态 */
 enum task_status
 {
@@ -79,6 +81,7 @@ struct thread_stack
 struct task_struct
 {
     uint32_t *self_kstack; // 各内核线程都用自己的内核栈
+    pid_t pid;             // 线程或进程的ID
     enum task_status status;
     char name[16];
     uint8_t priority;              // 线程优先级
@@ -87,9 +90,10 @@ struct task_struct
     struct list_elem general_tag;  // 用于线程的通用链表
     struct list_elem all_list_tag; // 用于所有线程的链表
 
-    uint32_t *pgdir;                    // 进程页目录的虚拟地址,用于页表切换
-    struct virtual_addr userprog_vaddr; // 用户进程的虚拟地址池
-    uint32_t stack_magic;               // 用这串数字做栈的边界标记,用于检测栈的溢出
+    uint32_t *pgdir;                              // 进程页目录的虚拟地址,用于页表切换
+    struct virtual_addr userprog_vaddr;           // 用户进程的虚拟地址池
+    struct mem_block_desc u_block_desc[DESC_CNT]; // 用户进程的内存块描述符数组
+    uint32_t stack_magic;                         // 用这串数字做栈的边界标记,用于检测栈的溢出
 };
 
 void thread_create(struct task_struct *pthread, thread_func function, void *func_arg);

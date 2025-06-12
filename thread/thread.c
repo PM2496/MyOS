@@ -7,6 +7,7 @@
 #include "../lib/kernel/print.h"
 #include "../kernel/memory.h"
 #include "../userprog/process.h"
+#include "sync.h"
 
 #define PG_SIZE 4096
 
@@ -15,7 +16,18 @@ struct list thread_ready_list;       // 就绪线程队列
 struct list thread_all_list;         // 所有线程队列
 static struct list_elem *thread_tag; // 用于遍历线程链表的指针
 
+struct lock pid_lock; // 保护pid的锁,防止pid被多个线程同时修改
+
 extern void switch_to(struct task_struct *cur, struct task_struct *next);
+
+static pid_t allocate_pid(void)
+{
+    static pid_t next_pid = 0; // 下一个可用的pid
+    lock_acquire(&pid_lock);   // 获取pid锁，防止多个线程同时修改pid
+    next_pid++;                // 增加下一个可用的pid
+    lock_release(&pid_lock);   // 释放pid锁
+    return next_pid;           // 返回分配的pid
+}
 
 /* 获取当前线程pcb指针 */
 struct task_struct *running_thread(void)
@@ -54,6 +66,7 @@ void thread_create(struct task_struct *pthread, thread_func *function, void *fun
 void init_thread(struct task_struct *pthread, char *name, int prio)
 {
     memset(pthread, 0, sizeof(*pthread)); // 清空线程结构体
+    pthread->pid = allocate_pid();        // 分配pid
     strcpy(pthread->name, name);          // 复制线程名
 
     if (pthread == main_thread)
@@ -181,6 +194,7 @@ void thread_init(void)
     put_str("thread_init start\n");
     list_init(&thread_ready_list); // 初始化就绪线程队列
     list_init(&thread_all_list);   // 初始化所有线程队列
+    lock_init(&pid_lock);          // 初始化pid锁
 
     make_main_thread(); // 创建主线程
 

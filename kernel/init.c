@@ -7,6 +7,7 @@
 #include "../device/console.h"
 #include "../device/keyboard.h"
 #include "../userprog/tss.h"
+#include "../userprog/syscall_init.h"
 
 void init_all(void)
 {
@@ -18,4 +19,5 @@ void init_all(void)
     console_init();  // Initialize the console
     keyboard_init(); // Initialize the keyboard
     tss_init();      // Initialize Task State Segment
+    syscall_init();  // Initialize system calls
 }
