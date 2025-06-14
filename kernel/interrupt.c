@@ -45,8 +45,8 @@ static void pic_init(void)
     outb(PIC_S_DATA, 0x01); // Enable Slave PIC
 
     /* timer中断 */
-    outb(PIC_M_DATA, 0xfe); // Mask all IRQs except for timer (IRQ0)
-    outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
+    // outb(PIC_M_DATA, 0xfe); // Mask all IRQs except for timer (IRQ0)
+    // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
 
     /* 键盘中断 */
     // outb(PIC_M_DATA, 0xfd); // Mask all IRQs except for keyboard (IRQ1)
@@ -56,6 +56,12 @@ static void pic_init(void)
     // outb(PIC_M_DATA, 0xfc); // Mask all IRQs except for timer (IRQ0) and keyboard (IRQ1)
     // outb(PIC_S_DATA, 0xff); // Mask all IRQs on Slave PIC
 
+    /* IRQ2用于级联从片,必须打开,否则无法响应从片上的中断
+     * 主片上打开的中断有IRQ0的时钟,IRQ1的键盘和级联从片的IRQ2,其它全部关闭 */
+    outb(PIC_M_DATA, 0xf8);
+
+    /* 打开从片上的IRQ14,此引脚接收硬盘控制器的中断 */
+    outb(PIC_S_DATA, 0xbf);
     put_str("   pic_init done\n");
 }
 

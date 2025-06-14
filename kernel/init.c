@@ -8,6 +8,7 @@
 #include "../device/keyboard.h"
 #include "../userprog/tss.h"
 #include "../userprog/syscall_init.h"
+#include "../device/ide.h"
 
 void init_all(void)
 {
@@ -20,4 +21,6 @@ void init_all(void)
     keyboard_init(); // Initialize the keyboard
     tss_init();      // Initialize Task State Segment
     syscall_init();  // Initialize system calls
+    intr_enable();   // Enable interrupts
+    ide_init();      // Initialize IDE (if applicable)
 }

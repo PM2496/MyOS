@@ -118,4 +118,5 @@ struct gdt_desc
 
 #define PG_SIZE 4096
 
+#define UNUSED __attribute__((unused)) // 未使用的变量
 #endif

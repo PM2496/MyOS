@@ -31,7 +31,9 @@ OBJS = $(BUILD_DIR)/main.o \
 	   $(BUILD_DIR)/process.o \
 	   $(BUILD_DIR)/syscall.o \
 	   $(BUILD_DIR)/syscall_init.o \
-	   $(BUILD_DIR)/stdio.o
+	   $(BUILD_DIR)/stdio.o \
+	   $(BUILD_DIR)/ide.o \
+	   $(BUILD_DIR)/stdio_kernel.o
 
 $(BUILD_DIR)/mbr.bin: boot/mbr.S 
 	$(AS) $(ASBINLIB) -o $@ $<
@@ -137,6 +139,15 @@ $(BUILD_DIR)/stdio.o: lib/stdio.c lib/stdio.h lib/stdint.h kernel/interrupt.h \
 					  kernel/global.h lib/string.h lib/user/syscall.h lib/kernel/print.h
 	$(CC) $(CFLAGS) $< -o $@
 
+$(BUILD_DIR)/ide.o: device/ide.c device/ide.h lib/stdint.h thread/sync.h \
+					lib/kernel/list.h kernel/global.h thread/thread.h lib/kernel/bitmap.h \
+					kernel/memory.h lib/kernel/io.h lib/stdio.h lib/kernel/stdio_kernel.h\
+					kernel/interrupt.h kernel/debug.h device/console.h device/timer.h lib/string.h
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/stdio_kernel.o: lib/kernel/stdio_kernel.c lib/kernel/stdio_kernel.h lib/stdint.h \
+							 lib/kernel/print.h lib/stdio.h device/console.h kernel/global.h
+	$(CC) $(CFLAGS) $< -o $@
 
 
 $(BUILD_DIR)/kernel.o: kernel/kernel.S 
