@@ -4,6 +4,7 @@
 #include "string.h"
 #include "./kernel/print.h"
 #include "../lib/user/syscall.h"
+#include "../fs/fs.h"
 
 #define va_start(ap, v) ap = (va_list) & v // 把ap指向第一个固定参数v
 #define va_arg(ap, t) *((t *)(ap += 4))    // ap指向下一个参数并返回其值
@@ -87,11 +88,11 @@ uint32_t vsprintf(char *str, const char *format, va_list ap)
 uint32_t printf(const char *format, ...)
 {
     va_list args;
-    va_start(args, format);      // 使args指向format
-    char buf[1024] = {0};        // 缓冲区,用于存储格式化后的字符串
-    vsprintf(buf, format, args); // 调用vsprintf进行格式化
-    va_end(args);                // 清除args
-    return write(buf);           // 将格式化后的字符串输出到控制台
+    va_start(args, format);            // 使args指向format
+    char buf[1024] = {0};              // 缓冲区,用于存储格式化后的字符串
+    vsprintf(buf, format, args);       // 调用vsprintf进行格式化
+    va_end(args);                      // 清除args
+    return write(1, buf, strlen(buf)); // 将格式化后的字符串输出到控制台
 }
 
 uint32_t sprintf(char *buf, const char *format, ...)
