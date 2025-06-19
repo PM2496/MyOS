@@ -96,6 +96,7 @@ struct task_struct
     uint32_t *pgdir;                              // 进程页目录的虚拟地址,用于页表切换
     struct virtual_addr userprog_vaddr;           // 用户进程的虚拟地址池
     struct mem_block_desc u_block_desc[DESC_CNT]; // 用户进程的内存块描述符数组
+    uint32_t cwd_inode_nr;                        // 当前工作目录的i结点号
     uint32_t stack_magic;                         // 用这串数字做栈的边界标记,用于检测栈的溢出
 };
 

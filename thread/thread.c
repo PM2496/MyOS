@@ -107,6 +107,7 @@ void init_thread(struct task_struct *pthread, char *name, int prio)
         fd_idx++;
     }
 
+    pthread->cwd_inode_nr = 0;         // 当前工作目录的i结点号初始化为0(根目录)
     pthread->stack_magic = 0x19870916; // 栈边界标记，用于检测栈溢出
 }
 
