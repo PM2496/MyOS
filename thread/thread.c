@@ -95,7 +95,19 @@ void init_thread(struct task_struct *pthread, char *name, int prio)
     pthread->ticks = prio;                                            // 初始化时间片为优先级
     pthread->elapsed_ticks = 0;                                       // 已运行时间片数初始化为0
     pthread->pgdir = NULL;                                            // 进程页目录初始化为NULL
-    pthread->stack_magic = 0x19870916;                                // 栈边界标记，用于检测栈溢出
+
+    pthread->fd_table[0] = 0;
+    pthread->fd_table[1] = 1; // 标准输入输出文件描述符初始化为0和1
+    pthread->fd_table[2] = 2; // 标准错误输出文件描述符初始化为2
+
+    uint8_t fd_idx = 3; // 从3开始分配文件描述符
+    while (fd_idx < MAX_FILES_OPEN_PER_PROC)
+    {
+        pthread->fd_table[fd_idx] = -1; // 其它文件描述符
+        fd_idx++;
+    }
+
+    pthread->stack_magic = 0x19870916; // 栈边界标记，用于检测栈溢出
 }
 
 /* 创建一优先级为prio的线程,线程名为name,线程所执行的函数是function(func_arg) */

@@ -9,6 +9,7 @@
 #include "../userprog/tss.h"
 #include "../userprog/syscall_init.h"
 #include "../device/ide.h"
+#include "../fs/fs.h"
 
 void init_all(void)
 {
@@ -23,4 +24,5 @@ void init_all(void)
     syscall_init();  // Initialize system calls
     intr_enable();   // Enable interrupts
     ide_init();      // Initialize IDE (if applicable)
+    filesys_init();  // Initialize the file system
 }

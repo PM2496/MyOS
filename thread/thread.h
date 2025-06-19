@@ -5,6 +5,8 @@
 #include "../lib/kernel/bitmap.h"
 #include "../kernel/memory.h"
 
+#define MAX_FILES_OPEN_PER_PROC 8 // 每个进程最多打开的文件数
+
 /* 自定义通用函数类型,它将在很多线程函数中做为形参类型 */
 typedef void thread_func(void *);
 
@@ -84,11 +86,12 @@ struct task_struct
     pid_t pid;             // 线程或进程的ID
     enum task_status status;
     char name[16];
-    uint8_t priority;              // 线程优先级
-    uint32_t ticks;                // 线程的时间片
-    uint32_t elapsed_ticks;        // 线程已运行的时间片数
-    struct list_elem general_tag;  // 用于线程的通用链表
-    struct list_elem all_list_tag; // 用于所有线程的链表
+    uint8_t priority;                          // 线程优先级
+    uint32_t ticks;                            // 线程的时间片
+    uint32_t elapsed_ticks;                    // 线程已运行的时间片数
+    int32_t fd_table[MAX_FILES_OPEN_PER_PROC]; // 线程打开的文件描述符表,每个线程最多打开8个文件
+    struct list_elem general_tag;              // 用于线程的通用链表
+    struct list_elem all_list_tag;             // 用于所有线程的链表
 
     uint32_t *pgdir;                              // 进程页目录的虚拟地址,用于页表切换
     struct virtual_addr userprog_vaddr;           // 用户进程的虚拟地址池
