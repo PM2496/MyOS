@@ -97,8 +97,12 @@ struct task_struct
     struct virtual_addr userprog_vaddr;           // 用户进程的虚拟地址池
     struct mem_block_desc u_block_desc[DESC_CNT]; // 用户进程的内存块描述符数组
     uint32_t cwd_inode_nr;                        // 当前工作目录的i结点号
+    int16_t parent_pid;                           // 父进程的pid,如果是内核线程则为-1
     uint32_t stack_magic;                         // 用这串数字做栈的边界标记,用于检测栈的溢出
 };
+
+extern struct list thread_ready_list; // 就绪线程队列
+extern struct list thread_all_list;   // 所有线程队列
 
 void thread_create(struct task_struct *pthread, thread_func function, void *func_arg);
 void init_thread(struct task_struct *pthread, char *name, int prio);
@@ -109,4 +113,7 @@ void thread_block(enum task_status status);
 void thread_unblock(struct task_struct *pthread);
 void thread_init(void);
 void thread_yield(void);
+pid_t fork_pid(void);
+void sys_ps(void);
+
 #endif
