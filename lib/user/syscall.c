@@ -1,6 +1,7 @@
 #include "syscall.h"
-#include "../stdint.h"
-#include "../../kernel/global.h"
+// #include "../stdint.h"
+// #include "../../kernel/global.h"
+#include "../../thread/thread.h"
 
 /* 大括号中最后一个语句会作为返回值 */
 /* 无参数的系统调用 */
@@ -171,4 +172,9 @@ int32_t chdir(const char *path)
 void ps(void)
 {
     _syscall0(SYS_PS);
+}
+
+int execv(const char *pathname, char **argv)
+{
+    return _syscall2(SYS_EXECV, pathname, argv);
 }

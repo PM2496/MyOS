@@ -1,11 +1,12 @@
 #include "string.h"
-#include "../kernel/global.h"
-#include "../kernel/debug.h"
-#include "stdint.h"
+// #include "../kernel/global.h"
+// #include "../kernel/debug.h"
+// #include "stdint.h"
+#include "../lib/user/assert.h"
 
 void memset(void *dst_, uint8_t value, uint32_t size)
 {
-    ASSERT(dst_ != NULL);
+    assert(dst_ != NULL);
 
     uint8_t *dst = (uint8_t *)dst_;
     while (size-- > 0)
@@ -16,7 +17,7 @@ void memset(void *dst_, uint8_t value, uint32_t size)
 
 void memcpy(void *dst_, const void *src_, uint32_t size)
 {
-    ASSERT(dst_ != NULL && src_ != NULL);
+    assert(dst_ != NULL && src_ != NULL);
 
     uint8_t *dst = (uint8_t *)dst_;
     const uint8_t *src = (const uint8_t *)src_;
@@ -28,7 +29,7 @@ void memcpy(void *dst_, const void *src_, uint32_t size)
 
 int memcmp(const void *a_, const void *b_, uint32_t size)
 {
-    ASSERT(a_ != NULL && b_ != NULL);
+    assert(a_ != NULL && b_ != NULL);
 
     const char *a = (const char *)a_;
     const char *b = (const char *)b_;
@@ -46,7 +47,7 @@ int memcmp(const void *a_, const void *b_, uint32_t size)
 
 char *strcpy(char *dst_, const char *src_)
 {
-    ASSERT(dst_ != NULL && src_ != NULL);
+    assert(dst_ != NULL && src_ != NULL);
 
     char *r = dst_;
     while ((*dst_++ = *src_++) != '\0')
@@ -56,7 +57,7 @@ char *strcpy(char *dst_, const char *src_)
 
 uint32_t strlen(const char *str)
 {
-    ASSERT(str != NULL);
+    assert(str != NULL);
 
     const char *p = str;
     while (*p != '\0')
@@ -68,7 +69,7 @@ uint32_t strlen(const char *str)
 
 int8_t strcmp(const char *a_, const char *b_)
 {
-    ASSERT(a_ != NULL && b_ != NULL);
+    assert(a_ != NULL && b_ != NULL);
 
     while (*a_ != '\0' && *a_ == *b_)
     {
@@ -80,7 +81,7 @@ int8_t strcmp(const char *a_, const char *b_)
 
 char *strchr(const char *string, const uint8_t ch)
 {
-    ASSERT(string != NULL);
+    assert(string != NULL);
 
     while (*string != '\0')
     {
@@ -95,7 +96,7 @@ char *strchr(const char *string, const uint8_t ch)
 
 char *strrchr(const char *string, const uint8_t ch)
 {
-    ASSERT(string != NULL);
+    assert(string != NULL);
 
     const char *last_occurrence = NULL;
     while (*string != '\0')
@@ -111,7 +112,7 @@ char *strrchr(const char *string, const uint8_t ch)
 
 char *strcat(char *dst_, const char *src_)
 {
-    ASSERT(dst_ != NULL && src_ != NULL);
+    assert(dst_ != NULL && src_ != NULL);
 
     char *str = dst_;
     while (*str != '\0') // Move to the end of dst_
@@ -126,7 +127,7 @@ char *strcat(char *dst_, const char *src_)
 /* 在字符串str中查找字符ch出现的次数 */
 uint32_t strchrs(const char *str, uint8_t ch)
 {
-    ASSERT(str != NULL);
+    assert(str != NULL);
 
     uint32_t count = 0;
     const char *p = str;

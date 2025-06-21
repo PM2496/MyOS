@@ -500,7 +500,7 @@ int32_t file_read(struct file *file, void *buf, uint32_t count)
         }
     }
     else
-    {   // 若要读多个块
+    { // 若要读多个块
         /* 第一种情况: 起始块和终止块属于直接块*/
         if (block_read_end_idx < 12)
         { // 数据结束所在的块属于直接块

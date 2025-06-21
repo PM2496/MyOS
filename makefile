@@ -41,7 +41,8 @@ OBJS = $(BUILD_DIR)/main.o \
 	   $(BUILD_DIR)/fork.o \
 	   $(BUILD_DIR)/shell.o \
 	   $(BUILD_DIR)/assert.o \
-	   $(BUILD_DIR)/buildin_cmd.o
+	   $(BUILD_DIR)/buildin_cmd.o \
+	   $(BUILD_DIR)/exec.o
 
 $(BUILD_DIR)/mbr.bin: boot/mbr.S 
 	$(AS) $(ASBINLIB) -o $@ $<
@@ -188,14 +189,19 @@ $(BUILD_DIR)/fork.o: userprog/fork.c userprog/fork.h thread/thread.h lib/stdint.
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/shell.o: shell/shell.c shell/shell.h lib/stdint.h fs/fs.h \
-					  lib/user/syscall.h lib/stdio.h lib/stdint.h kernel/global.h lib/user/assert.h
+					  lib/user/syscall.h lib/stdio.h kernel/global.h lib/user/assert.h
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/assert.o: lib/user/assert.c lib/user/assert.h lib/stdio.h lib/stdint.h
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/buildin_cmd.o: shell/buildin_cmd.c shell/buildin_cmd.h lib/stdint.h \
-							lib/user/syscall.h lib/stdio.h lib/stdint.h lib/string.h fs/fs.h
+							lib/user/syscall.h lib/stdio.h lib/string.h fs/fs.h
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/exec.o: userprog/exec.c userprog/exec.h thread/thread.h lib/stdint.h \
+					 lib/kernel/list.h kernel/global.h lib/kernel/bitmap.h kernel/memory.h \
+					lib/kernel/stdio_kernel.h fs/fs.h lib/string.h
 	$(CC) $(CFLAGS) $< -o $@
 
 
